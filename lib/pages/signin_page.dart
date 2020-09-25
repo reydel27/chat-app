@@ -46,7 +46,7 @@ class _Form extends StatefulWidget {
 class __FormState extends State<_Form> {
   final emailCtrl = TextEditingController();
   final passCtrl  = TextEditingController();
-  final guessCtrl = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +55,6 @@ class __FormState extends State<_Form> {
       padding: EdgeInsets.symmetric( horizontal: 30 ),
        child: Column(
          children: <Widget>[
-           CustomInput(
-             icon: Icons.verified_user, 
-             placeholder: 'Invitation Code', 
-             textController: guessCtrl
-          ),
            CustomInput(
              icon: Icons.mail_outline,
              placeholder: 'Email',

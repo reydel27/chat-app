@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'byS Messenger',
-      initialRoute: 'signin',
+      initialRoute: 'chat',
       routes: appRoutes,
     );
   }
