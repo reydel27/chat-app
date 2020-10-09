@@ -7,8 +7,8 @@ import 'package:messenger/widgets/custom_raised_buttom.dart';
 import 'package:messenger/widgets/logo.dart';
 import 'package:provider/provider.dart';
 
-class SigninPage extends StatelessWidget {
-  const SigninPage({Key key}) : super(key: key);
+class InvitationPage extends StatelessWidget {
+  const InvitationPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +24,9 @@ class SigninPage extends StatelessWidget {
                 Logo(),
                 _Form(),
                 CustomLabels(
-                  mainText: 'You have an invitation', 
-                  buttonText: 'Create account',
-                  to: 'invitation'
+                  mainText: 'You have an account', 
+                  buttonText: 'Sign in',
+                  to: 'signin'
                 ),
                 Text('Terms and conditions of use', style: TextStyle( fontWeight: FontWeight.w200 ))
               ],
@@ -47,9 +47,7 @@ class _Form extends StatefulWidget {
 }
 
 class __FormState extends State<_Form> {
-  final emailCtrl = TextEditingController();
-  final passCtrl  = TextEditingController();
-
+  final codeCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +60,9 @@ class __FormState extends State<_Form> {
        child: Column(
          children: <Widget>[
            CustomInput(
-             icon: Icons.mail_outline,
-             placeholder: 'Email',
-             keyboardType: TextInputType.emailAddress,
-             textController: emailCtrl,
-           ),
-           CustomInput(
-             icon: Icons.lock_outline,
-             placeholder: 'Password',
-             textController: passCtrl,
-             isPassword: true,
+             icon: Icons.verified_user_rounded,
+             placeholder: 'Invitation code',
+             textController: codeCtrl,
            ),           
            CustomRaisedButtom(
              textButtom: 'Join us now!',
@@ -79,17 +70,16 @@ class __FormState extends State<_Form> {
              onPressed: authService.signing ? null : () async {
 
                FocusScope.of( context ).unfocus();
-               final signin = await authService.signin(emailCtrl.text.trim(), passCtrl.text.trim());
+               final validate = await authService.validate(codeCtrl.text.trim().toUpperCase());
 
-               if( signin ){
-                 // conectar con socket server
-
-                 // navegar a otra pagina
-                Navigator.pushReplacementNamed(context, 'users');
+               if( validate['ok'] ){
+                 // navegar a otra pagina enviando el uid de la invitacion
+                Navigator.pushReplacementNamed(context, 'signup', arguments: { "invitation":  validate['invitation'] });
                }else{
-                 // Mostrar alerta
-                  showAlert(context, 'Authentication error', 'Sign in credentials fails');
+                 // Mostrar alerta con el error del backend
+                showAlert(context, 'Invitation error', validate['errors']);
                }
+
              },
           )
          ]

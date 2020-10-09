@@ -16,7 +16,7 @@ class _ChatPageState extends State<ChatPage> {
 
   final user = User(
     uid: '1',
-    name: 'Rey',
+    username: 'Rey',
     status: 'ETC como metes un elefante por una puerta',
     online: true
   );
@@ -55,7 +55,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: Column( 
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.name, style: TextStyle( color: Colors.black54, fontSize: 16),),
+                    Text(user.username, style: TextStyle( color: Colors.black54, fontSize: 16),),
                     Text( _isWriting ? 'is writing ...' : '', style: TextStyle( color: Colors.black54, fontSize: 12),)
                   ],
                 ),

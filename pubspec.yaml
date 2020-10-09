@@ -30,6 +30,9 @@ dependencies:
   cupertino_icons: ^0.1.3
   badges: ^1.1.1
   flutter_chat_bubble: ^1.0.2
+  provider: ^4.3.2+2
+  http: ^0.12.2
+  flutter_secure_storage: ^3.3.4
 
 dev_dependencies:
   flutter_test:
