@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:messenger/models/user.dart';
 import 'package:messenger/services/auth_service.dart';
+import 'package:messenger/services/chat_service.dart';
+import 'package:messenger/services/socket_service.dart';
+import 'package:messenger/services/users_service.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 
 class UsersPage extends StatefulWidget {
@@ -13,20 +17,21 @@ class UsersPage extends StatefulWidget {
 
 class _UsersPageState extends State<UsersPage> {
 
-  final users = [
-    User(uid: '1', status: 'ETC como metes un elefante por  una puerta', username: 'Rey', online: false),
-    User(uid: '2', status: 'Disponible', username: 'Laia', online: true),
-    User(uid: '3', status: 'Ocupado', username: 'Marta', online: true),
-    User(uid: '4', status: 'En el trabajo', username: 'Nino', online: true),
-  ];
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  List<User> users = [];
 
   @override
-  Widget build(BuildContext context) {
-
-    final authService = Provider.of<AuthService>(context);
-
+  void initState() {
+    this._loadUsers();
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context){
+    final authService = Provider.of<AuthService>( context );
+    final socketService = Provider.of<SocketService>( context );
     final user = authService.user;
 
+    
 
     return SafeArea(
       child: Scaffold(
@@ -38,53 +43,62 @@ class _UsersPageState extends State<UsersPage> {
             color: Colors.black54,
             icon: Icon(Icons.menu),
             onPressed: (){
+              socketService.disconnect();
               AuthService.closeSession(context);
             },
           ),
           actions: [
             Container(
               margin: EdgeInsets.only( right: 10 ),
-              child: Icon( Icons.offline_bolt, color: Colors.red),
+              child: Icon( Icons.offline_bolt, color: socketService.serverStatus == ServerStatus.Online ? Colors.green : Colors.red),
             )
           ],
         ),
-        body: Container(
-          child: ListView.separated(
-            physics: BouncingScrollPhysics(),
-            itemBuilder: (_, i) => _userListTile( users[i] ), 
-            separatorBuilder: (_, i) => Divider(), 
-            itemCount: users.length
-          )
+        body: SmartRefresher(
+          controller: _refreshController,
+          enablePullDown: true,
+          onRefresh: _loadUsers,
+          child: listViewUsers()
         ),
       ),
     );
   }
 
-  ListTile _userListTile( User user ) {
+  Container listViewUsers() {
+    return Container(
+        child: ListView.separated(
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (_, i) => _userListTile( users[i] ), 
+          separatorBuilder: (_, i) => Divider(), 
+          itemCount: users.length
+        )
+      );
+  }
+
+  ListTile _userListTile( User user ){ 
+    final chatService = Provider.of<ChatService>( context );
     return ListTile(
             title: Text(user.username),
-            subtitle: Text(user.status),
+            subtitle: Text(user.email),
             leading: CircleAvatar(
-              backgroundColor: user.online ? Colors.green[300] : Colors.red,
+              backgroundColor: Colors.black38,
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: Colors.grey,
               ),
             ),
-            /*
-            trailing: Container(
-              padding: EdgeInsets.only( right: 5, top: 5 ),
-              child: Column(
-                children: [
-                  Text('10:22'),
-                  Badge(
-                    badgeColor: Colors.blue[300],
-                    badgeContent: Text('3', style: TextStyle(color: Colors.white),),
-                  )
-                ],
-              ),
-            ),
-            */
+            onTap: () {
+              chatService.to = user;
+              Navigator.pushNamed(context, 'chat');
+            },
           );
   }
+
+  _loadUsers() async{
+    final usersService = new UsersService();
+    this.users = await usersService.getAll();
+    //await Future.delayed(Duration(milliseconds: 1000));
+    _refreshController.refreshCompleted();
+  }
+
 }

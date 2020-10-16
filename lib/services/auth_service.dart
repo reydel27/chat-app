@@ -9,6 +9,7 @@ import 'package:messenger/models/signin_response.dart';
 import 'package:messenger/models/user.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+//import 'package:messenger/services/socket_service.dart';
 
 class AuthService with ChangeNotifier {
 
@@ -56,7 +57,7 @@ class AuthService with ChangeNotifier {
     );
 
 
-    print( resp.body );
+    //print( resp.body );
     this.signing = false;
 
     if( resp.statusCode == 200 ){
@@ -90,7 +91,7 @@ class AuthService with ChangeNotifier {
     );
 
 
-    print( resp.body );
+    //print( resp.body );
     this.signing = false;
 
     if( resp.statusCode == 200 ){
@@ -137,8 +138,9 @@ class AuthService with ChangeNotifier {
     );
 
     if( resp.statusCode == 200 ){
-      final response = jsonDecode(resp.body);
-      await this._saveToken(response['token']);
+      final signinResponse =  signinResponseFromJson( resp.body );
+      this.user = signinResponse.user;
+      await this._saveToken(signinResponse.token);
       return true;
     }else{
       this.logout();

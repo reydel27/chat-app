@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messenger/helpers/show_alert.dart';
+import 'package:messenger/services/socket_service.dart';
 import 'package:messenger/widgets/custom_input.dart';
 import 'package:messenger/widgets/custom_labels.dart';
 import 'package:messenger/widgets/custom_raised_buttom.dart';
@@ -55,6 +56,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>( context );
+    final socketService = Provider.of<SocketService>(context);
     final Map arguments = ModalRoute.of(context).settings.arguments as Map;  
     
     return Container(
@@ -89,7 +91,7 @@ class __FormState extends State<_Form> {
 
                if( signup ){
                  // conectar con socket server
-
+                socketService.connect();
                  // navegar a otra pagina
                 Navigator.pushReplacementNamed(context, 'users');
                }else{
